@@ -5,6 +5,7 @@ needs no build step, which pnpm would otherwise block as an unapproved script.
 # `client/` is the built browser bundle. It is committed for the same reason as
 # lib/: git installs must not need a build. `src/client/` is separate source.
 dist/
+*.tgz
 *.tsbuildinfo
 *.log
 .DS_Store

@@ -183,6 +183,16 @@ Get-ChildItem '<DSH 安装目录>' -Recurse -File |
 
 ## 开发
 
+> **产物已入库，改完源码要一起提交。** `lib/` 与 `client/` 是**提交进仓库**的（因为 `dsh plugin add github:owner/repo#path:/…` 这类 git 安装不能跑构建脚本——pnpm 会以 `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` 拒绝执行 `prepare`，除非使用者在 `pnpm-workspace.yaml` 里逐条 allowlist）。所以改完 `src/` 之后必须：
+>
+> ```powershell
+> pnpm build          # 重新生成 lib/ 与 client/
+> git add -A          # 产物一并提交
+> ```
+>
+> 忘了这一步的后果是：GitHub 安装与市场安装都会装到旧代码，而本地开发完全正常——很难察觉。
+
+
 ```powershell
 pnpm typecheck     # 宿主半 + 浏览器半（两个 tsconfig）
 pnpm test          # 170 项
