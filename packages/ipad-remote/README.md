@@ -15,7 +15,7 @@ iPad / 手机 / 另一台电脑
 │  ① PIN 门禁 → 自签会话 cookie                │
 │  ② 反代 HTTP + WebSocket 升级                │
 │  ③ 代持内层 cookie（设备拿不到）             │
-│  ④ 提供增强的 PWA manifest、图标与触控适配层 │
+│  ④ 提供增强的 Web App manifest、图标与触控适配层 │
 └──────────────────────────────────────────────┘
    │  Host 重写为 127.0.0.1:<harnessPort>
    ▼
@@ -24,6 +24,15 @@ Harness webserver（保持默认回环绑定，不动）
 
 **Harness 本体不改绑定、不必重启**：开关是运行时的。上游"回环优先"的安全姿态原样保留。
 
+## 能力边界（它不是离线 PWA）
+
+| 能力 | 现状 |
+|---|---|
+| 安装成独立窗口的应用（桌面 Chrome/Edge、Android、iPad） | ✅ manifest + 图标 + `display: standalone` + 安全上下文，Chromium 判定 `INSTALLABLE` |
+| **离线打开** | ❌ **没有 service worker**：断网或主机没开时，打开是白页 |
+| 免 HTTPS | ⚠️ 做不到，这是浏览器的安全来源规则：只有 `localhost` 与 HTTPS 算安全来源。iPad 上的安装入口本来就是「分享 → 添加到主屏幕」，Safari 从不显示安装按钮 |
+
+所以准确的说法是**「可安装的 Web 应用」**；等补上 service worker（缓存应用外壳、API 与 WebSocket 永不缓存）之后，才配得上「PWA」这个词。
 ## 安装
 
 插件对 `@deepseek-ai/*` **没有任何运行时依赖**（全部是 type-only import），`lib/` 与 `client/` 都能独立加载；发布包里带着 `assets/` 与 `cordis.patch.yml`（`pnpm pack --dry-run` 已验证）。
@@ -78,7 +87,7 @@ dsh --patch <本仓库>/.run-overlay.yml --profile web --no-open --port 50080
 
 ## 使用
 
-1. 桌面端 Harness 打开**设置 → PWA 远程访问**。
+1. 桌面端 Harness 打开**设置 → 远程访问**。
 2. 设一个 6 位 PIN，打开开关。
 3. 列表里选一个可达地址，用 iPad 扫码或直接打开；输入 PIN。
 4. iPad Safari → 分享 → **添加到主屏幕**，得到一个全屏、无地址栏、独立图标的应用。
@@ -148,7 +157,7 @@ dsh --patch <本仓库>/.run-overlay.yml --profile web --no-open --port 50080
 | `$DSH_HOME/cordis.patch.yml` 里的托管块 | **注册**（home 层 patch，删掉整段即完全还原）——这是插件被加载的方式，不是改上游 |
 | `$DSH_HOME/plugins/ipad-remote/**` | 插件自己的状态文件与 TLS 材料 |
 
-具体到实现层面，这也是设计的一部分：PWA 资产走上游公开的 `ctx.webServer.tapIndex` 钩子注入、触控层由网关内联、目录流程经 `ctx.slots` 注册、设置页是普通的 `settings.section` 槽位——**没有一处修改或复制上游文件**。
+具体到实现层面，这也是设计的一部分：Web App 资产（manifest 与图标）走上游公开的 `ctx.webServer.tapIndex` 钩子注入、触控层由网关内联、目录流程经 `ctx.slots` 注册、设置页是普通的 `settings.section` 槽位——**没有一处修改或复制上游文件**。
 
 > **上游限制不绕过。** `dsh plugin --profile desktop add` 被 `args.ts` 的 `rejectElectronProfile` 拒绝，而要让 CLI 支持桌面 profile 就必须改官方源码——按本项目约束这条路**不走**。桌面端只使用两条不碰源码的途径：应用内插件管理器，或 `scripts/install-home-patch.ps1`（它只写 `$DSH_HOME/cordis.patch.yml`，即你自己的配置）。
 
@@ -202,7 +211,7 @@ node scripts/build-icons.mjs   # 重新生成主屏图标（零依赖）
 
 ### 设置卡片（浏览器半）
 
-设置面板里的「PWA 远程访问」一节由 `src/client/` 提供：标题/文案走 locale，数据全部来自上面那张控制接口表。
+设置面板里的「远程访问」一节由 `src/client/` 提供：标题/文案走 locale，数据全部来自上面那张控制接口表。
 
 - 产物是**一个** `client/settings.js`，格式是 Harness 客户端模块系统的 lazy-CJS 工厂包裹（`window.__ModuleLoader__.load({id, factory})`）。它会被内联进这一个文件，所以二维码编码器也是内联的，运行时不依赖任何额外文件。
 - **改完 `src/client/` 只需 `pnpm build` + 刷新页面**：bundle 由客户端模块系统按请求供应，页面重载会用新代码重新激活；只有宿主半（`src/*.ts`）的改动才需要重启 Harness。实测 2026-10-06：`pnpm build` 之后，运行中的实例立刻供出含新文案（`pinCurrent`、`PWA 远程访问`）的聚合。

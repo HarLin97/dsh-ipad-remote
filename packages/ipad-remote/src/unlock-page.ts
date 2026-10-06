@@ -92,7 +92,7 @@ export function renderUnlockPage(input: UnlockPageInput = {}): string {
            maxlength="${String(PIN_LENGTH)}" autocomplete="one-time-code" autofocus required />
     <button type="submit">解锁</button>
   </form>
-  <p class="hint">PIN 由桌面端 Harness 的「PWA 远程访问」设置中设置。</p>
+  <p class="hint">PIN 由桌面端 Harness 的「远程访问」设置中设置。</p>
 </main>
 </body>
 </html>

@@ -9,7 +9,7 @@
 
 /** Chinese dictionary — the source of the key union. */
 export const zh = {
-  nav: 'PWA 远程访问',
+  nav: '远程访问',
   intro: '开启后，同一局域网或 Tailscale 网络里的设备可以打开这个 Harness 的同一个界面，入口由这个 PIN 把守。',
   enableLabel: '允许远程访问',
   enableHint: '关闭只停止监听，PIN 与配置都会保留。',
@@ -61,7 +61,7 @@ export type IpadRemoteKey = keyof typeof zh
 
 /** English dictionary. */
 export const en: Record<IpadRemoteKey, string> = {
-  nav: 'PWA Remote Access',
+  nav: 'Remote Access',
   intro: 'Once enabled, a device on the same LAN or Tailscale network can open this very Harness UI; the PIN below guards the entrance.',
   enableLabel: 'Allow remote access',
   enableHint: 'Turning this off only stops the listener; the PIN and configuration are kept.',

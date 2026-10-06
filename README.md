@@ -2,7 +2,7 @@
 
 让 **iPad / 手机 / 另一台电脑**通过局域网、Tailscale 或 HTTPS 使用**桌面端 DeepSeek Harness 的同一个 Web UI**，并在网络入口加一层自己的 6 位 PIN 门禁。
 
-- **不做第二套 UI**：打开的就是桌面端那一个页面，PWA「添加到主屏幕」后即为独立窗口的 app。
+- **不做第二套 UI**：打开的就是桌面端那一个页面；安装后是独立窗口的 app（可安装的 Web 应用，暂无离线能力——见[能力边界](packages/ipad-remote/README.md#能力边界它不是离线-pwa)）。
 - **不改上游**：全部通过公开接缝接入（`tapIndex` / `ctx.slots` / `settings.section` / `dsh.bundle.patch` + `dsh.client`），Harness 本体保持在回环绑定。
 - **运行时零依赖**：对 `@deepseek-ai/*` 只有 type-only import，`lib/` 与 `client/` 可独立加载。
 
@@ -23,13 +23,13 @@ git clone <this repo> ; cd <this repo> ; pnpm install ; pnpm build
 
 ## 用起来
 
-1. 桌面端 Harness → **设置 → PWA 远程访问** → 设 6 位 PIN → 打开开关。
+1. 桌面端 Harness → **设置 → 远程访问** → 设 6 位 PIN → 打开开关。
 2. 设备打开网关地址（局域网 `http://<本机IP>:50070/`，启用 HTTPS 后 `https://<本机IP>:50071/`），输入 PIN。
 3. iOS 用「添加到主屏幕」；安卓与桌面 Chrome/Edge 用地址栏的「安装应用」（需要 HTTPS，先跑 [scripts/make-tls.ps1](scripts/make-tls.ps1) 并给设备装一次根证书）。
 
 ## 仓库结构
 
-- [packages/ipad-remote](packages/ipad-remote/README.md) —— 插件本体（网关、PIN 门禁、PWA 资产、触控层、设置卡片）与全部文档
+- [packages/ipad-remote](packages/ipad-remote/README.md) —— 插件本体（网关、PIN 门禁、Web App 资产、触控层、设置卡片）与全部文档
 - [scripts](scripts) —— 证书签发、home 层安装、真实链路验证、DOM 锚点审计
 - [docs/superpowers/specs](docs/superpowers/specs) —— 设计规格（决策与取舍记录）
 

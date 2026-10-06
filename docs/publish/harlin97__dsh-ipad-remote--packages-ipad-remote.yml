@@ -5,5 +5,5 @@ url: https://github.com/harlin97/dsh-ipad-remote/tree/main/packages/ipad-remote
 name: harlin97/dsh-ipad-remote#ipad-remote
 category: remote
 description:
-  en: Shares the desktop DeepSeek Harness web UI with phones, tablets and other computers over the LAN or Tailscale, behind a six-digit PIN gate, serving the PWA manifest, icons and an optional self-signed HTTPS listener.
-  zh: 把桌面端 DeepSeek Harness 的 Web UI 通过局域网或 Tailscale 分享给手机、平板与别的电脑，入口是一道六位 PIN 门禁，并提供 PWA 清单、图标与可选的自签 HTTPS 监听。
+  en: Shares the desktop DeepSeek Harness web UI with phones, tablets and other computers over the LAN or Tailscale, behind a six-digit PIN gate, serving an installable web-app manifest, icons and an optional self-signed HTTPS listener.
+  zh: 把桌面端 DeepSeek Harness 的 Web UI 通过局域网或 Tailscale 分享给手机、平板与别的电脑，入口是一道六位 PIN 门禁，并提供可安装的 Web 应用清单、图标与可选的自签 HTTPS 监听。
