@@ -3193,7 +3193,7 @@ window.__ModuleLoader__.load({
 				text: entry.url,
 				label: `${t("qrLabel")}：${entry.url}`,
 				size: QR_SIZE
-			})))), (0, react.createElement)("p", { style: S.hint }, t("addressesHint"))), status === void 0 ? null : (0, react.createElement)("div", { style: S.block }, (0, react.createElement)("h3", { style: S.blockTitle }, t("sessionsTitle")), status.sessions.length === 0 ? (0, react.createElement)("p", { style: S.hint }, t("sessionsEmpty")) : (0, react.createElement)("ul", { style: S.list }, ...status.sessions.map((session, index) => (0, react.createElement)("li", {
+			})))), (0, react.createElement)("p", { style: S.hint }, t("addressesHint")), (0, react.createElement)("p", { style: S.hint }, t("addressesInstallHint"))), status === void 0 ? null : (0, react.createElement)("div", { style: S.block }, (0, react.createElement)("h3", { style: S.blockTitle }, t("sessionsTitle")), status.sessions.length === 0 ? (0, react.createElement)("p", { style: S.hint }, t("sessionsEmpty")) : (0, react.createElement)("ul", { style: S.list }, ...status.sessions.map((session, index) => (0, react.createElement)("li", {
 				key: `${session.issuedAt}-${String(index)}`,
 				style: S.item
 			}, (0, react.createElement)("span", null, session.label), (0, react.createElement)("span", { style: S.hint }, `${t("issuedAt")} ${formatTime(session.issuedAt)} · ${t("expiresAt")} ${formatTime(session.expiresAt)}`)))), status.sessions.length === 0 ? null : (0, react.createElement)("div", { style: S.actions }, (0, react.createElement)(_deepseek_ai_dsh_client_ui_primitives.Button, {
@@ -3259,6 +3259,7 @@ window.__ModuleLoader__.load({
 			addressesTitle: "在设备上打开",
 			addressesHint: "用手机相机扫描二维码，或手动输入下面的地址。",
 			addressesEmpty: "还没有可用的地址：本机没有已启用的网络接口。",
+			addressesInstallHint: "「安装成 app」必须用 HTTPS 地址：浏览器只把 localhost 与 HTTPS 当作安全来源，http:// 的局域网地址不会出现安装入口（iPad 上则是「分享 → 添加到主屏幕」，Safari 从来不显示安装按钮）。",
 			copy: "复制",
 			copied: "地址已复制",
 			copyFailed: "复制失败，请手动选择地址",
@@ -3306,6 +3307,7 @@ window.__ModuleLoader__.load({
 			addressesTitle: "Open on a device",
 			addressesHint: "Scan a code with a phone camera, or type the address below.",
 			addressesEmpty: "No address yet: this machine has no enabled network interface.",
+			addressesInstallHint: "Installing as an app needs the HTTPS address: browsers treat only localhost and HTTPS as secure origins, so an http:// LAN address never shows an install entry (on iPad it is Share, then Add to Home Screen — Safari shows no install button at all).",
 			copy: "Copy",
 			copied: "Address copied",
 			copyFailed: "Copy failed — select the address manually",

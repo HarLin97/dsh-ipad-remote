@@ -290,7 +290,8 @@ export function IpadRemoteSection({ t, api }: IpadRemoteSectionProps) {
                 onClick: () => { onCopy(entry.url) },
               }, t('copy')))),
             h(QrCode, { text: entry.url, label: `${t('qrLabel')}：${entry.url}`, size: QR_SIZE })))),
-      h('p', { style: S.hint }, t('addressesHint'))),
+      h('p', { style: S.hint }, t('addressesHint')),
+      h('p', { style: S.hint }, t('addressesInstallHint'))),
 
     status === undefined ? null : h('div', { style: S.block },
       h('h3', { style: S.blockTitle }, t('sessionsTitle')),
