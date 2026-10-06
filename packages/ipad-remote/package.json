@@ -73,6 +73,7 @@
   },
   "description": "Share the desktop DeepSeek Harness UI with phones, tablets and other computers over LAN, Tailscale or HTTPS, behind a six-digit PIN gate — as an installable PWA.",
   "keywords": [
+    "dsh-plugin",
     "dsh",
     "deepseek-harness",
     "plugin",
