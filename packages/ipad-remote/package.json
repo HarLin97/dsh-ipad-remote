@@ -1,0 +1,100 @@
+{
+  "name": "@harlin97/dsh-ipad-remote",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "client",
+    "assets",
+    "cordis.patch.yml"
+  ],
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./client/settings.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-locale"
+      ],
+      "platform": "web"
+    },
+    "engines": {
+      "dsh": ">=0.2.1-alpha.1"
+    }
+  },
+  "scripts": {
+    "build": "pnpm build:server && pnpm build:client",
+    "build:server": "tsc -p tsconfig.build.json",
+    "build:client": "tsdown -c tsdown.settings.config.ts",
+    "prepare": "pnpm build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.client.json",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.5-alpha.1",
+    "@deepseek-ai/dsh-client-connection": "^0.2.1-alpha.1",
+    "@deepseek-ai/dsh-host-webserver": "^0.2.1-alpha.1"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.5-alpha.1",
+    "@deepseek-ai/dsh-client-connection": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-host-webserver": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-locale": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.1-alpha.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "~18.3.12",
+    "@types/react-dom": "~18.3.1",
+    "jsqr": "^1.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsdown": "^0.23.0",
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0",
+    "ws": "^8.18.0",
+    "@types/ws": "^8.5.12",
+    "js-yaml": "^4.1.0",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "description": "Share the desktop DeepSeek Harness UI with phones, tablets and other computers over LAN, Tailscale or HTTPS, behind a six-digit PIN gate — as an installable PWA.",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "pwa",
+    "remote",
+    "ipad",
+    "lan",
+    "tailscale"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harlin97/dsh-ipad-remote.git"
+  },
+  "homepage": "https://github.com/harlin97/dsh-ipad-remote#readme",
+  "bugs": {
+    "url": "https://github.com/harlin97/dsh-ipad-remote/issues"
+  }
+}

@@ -1,0 +1,15 @@
+# Dev overlay: load this plugin into a Harness instance without touching a
+# profile. Pass with --patch — a LAUNCHER-level option, so it must precede the
+# profile name (the CLI enables positional options).
+#
+# Mirrors the plugin own cordis.patch.yml: adaptive chooser off, browsing backend
+# mounted, no surface (the plugin decides per page). That file explains why.
+- id: directory-picker
+  name: '@deepseek-ai/dsh-host-directory-picker-auto'
+  disabled: true
+
+- insert:
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+    - id: ipad-remote
+      name: "file:///<this repo>/packages/ipad-remote/lib/index.js"

@@ -1,0 +1,24 @@
+# Directory picker: the backend stays, the SURFACE is ours.
+#
+# `directory-picker-auto` would mount one decision for every client at boot. On
+# this machine it picks native (loopback bind + win32), whose surface opens the
+# system window on THIS screen — fine locally, useless from a phone.
+#
+# So the adaptive chooser is off, the browsing BACKEND stays mounted (the client
+# workspace service is built around the `directoryPicker` namespace existing), and
+# NO surface is mounted here: the plugin client half occupies the flow slots only
+# on a page that has the Electron bridge, which is the desktop app. A browser
+# therefore sees no flow, and ui-workspace stops offering "add workspace" there —
+# exactly the split this deployment wants.
+#
+# Both halves of the upstream browsing pair used to be mounted here; that also
+# moved the desktop off its own window. See git history (2b94c41, 10c589e).
+- id: directory-picker
+  name: '@deepseek-ai/dsh-host-directory-picker-auto'
+  disabled: true
+
+- insert:
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+    - id: ipad-remote
+      name: '@harlin97/dsh-ipad-remote'
