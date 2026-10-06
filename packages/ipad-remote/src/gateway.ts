@@ -18,6 +18,7 @@
 import { createServer, request as httpRequest, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
 import { createServer as createSecureServer, type Server as SecureServer } from 'node:https'
 import type { Socket } from 'node:net'
+import { GATEWAY_MARKER } from './service-worker.js'
 import type { TlsMaterial } from './tls.js'
 import { SESSION_COOKIE, type SessionAuthority } from './session.js'
 import type { InnerTarget } from './inner-session.js'
@@ -109,6 +110,26 @@ export function sessionSetCookie(value: string, maxAgeSeconds: number, secure: b
 /** Clear-cookie header for logout. */
 export function sessionClearCookie(): string {
   return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`
+}
+
+/**
+ * Mark one proxied document as gateway-served.
+ *
+ * The client half registers its service worker only when this mark is present, so
+ * the desktop window — which shares a machine, and often a cookie jar, with the
+ * gateway — never gains a worker that could serve it stale assets.
+ * @param html - the document as the Harness rendered it.
+ * @returns the document carrying the marker script.
+ */
+export function injectGatewayMarker(html: string): string {
+  const mark = `${GATEWAY_MARKER}=true`
+  if (html.includes(mark)) return html
+  const tag = `<script>window.${mark}</script>`
+  const headEnd = html.search(/<\/head>/i)
+  if (headEnd >= 0) return `${html.slice(0, headEnd)}${tag}${html.slice(headEnd)}`
+  const bodyEnd = html.search(/<\/body>/i)
+  if (bodyEnd >= 0) return `${html.slice(0, bodyEnd)}${tag}${html.slice(bodyEnd)}`
+  return `${html}${tag}`
 }
 
 /**
@@ -281,8 +302,26 @@ export class Gateway {
       // Strip the Harness cookie: the browser must never hold it.
       const outbound = { ...answer.headers }
       delete outbound['set-cookie']
-      res.writeHead(answer.statusCode ?? 502, outbound)
-      answer.pipe(res)
+      const status = answer.statusCode ?? 502
+      if (status !== 200 || !String(outbound['content-type'] ?? '').includes('text/html')) {
+        res.writeHead(status, outbound)
+        answer.pipe(res)
+        return
+      }
+      // Documents are buffered so the gateway can mark them. Everything else —
+      // including the long-lived `/api` streams — keeps streaming.
+      const chunks: Buffer[] = []
+      answer.on('data', (chunk: Buffer) => { chunks.push(chunk) })
+      answer.on('end', () => {
+        const body = Buffer.from(injectGatewayMarker(Buffer.concat(chunks).toString('utf8')), 'utf8')
+        delete outbound['content-encoding']
+        delete outbound['etag']
+        delete outbound['transfer-encoding']
+        outbound['content-length'] = String(body.length)
+        res.writeHead(status, outbound)
+        res.end(body)
+      })
+      answer.on('error', () => { res.destroy() })
     })
     upstream.on('error', (error: Error) => {
       this.log('warn', `upstream request failed: ${error.message}`)
@@ -352,7 +391,11 @@ export class Gateway {
     const authority = `${target.host}:${String(target.port)}`
     const headers: Record<string, string | string[]> = {}
     for (const [key, value] of Object.entries(req.headers)) {
+      // `accept-encoding` is dropped so documents arrive as identity bytes: the
+      // gateway buffers HTML to mark it, and re-compressing would be work for no
+      // gain on a LAN.
       if (value === undefined || key === 'cookie' || key === 'host' || key === 'origin') continue
+      if (key === 'accept-encoding') continue
       headers[key] = value
     }
     headers['host'] = authority

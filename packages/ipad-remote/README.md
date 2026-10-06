@@ -24,15 +24,17 @@ Harness webserver（保持默认回环绑定，不动）
 
 **Harness 本体不改绑定、不必重启**：开关是运行时的。上游"回环优先"的安全姿态原样保留。
 
-## 能力边界（它不是离线 PWA）
+## 能力边界
 
 | 能力 | 现状 |
 |---|---|
 | 安装成独立窗口的应用（桌面 Chrome/Edge、Android、iPad） | ✅ manifest + 图标 + `display: standalone` + 安全上下文，Chromium 判定 `INSTALLABLE` |
-| **离线打开** | ❌ **没有 service worker**：断网或主机没开时，打开是白页 |
-| 免 HTTPS | ⚠️ 做不到，这是浏览器的安全来源规则：只有 `localhost` 与 HTTPS 算安全来源。iPad 上的安装入口本来就是「分享 → 添加到主屏幕」，Safari 从不显示安装按钮 |
+| 离线打开 | ✅ 页面注册 service worker 并预缓存应用外壳（`/`、manifest、图标）：断网重载显示上次的页面，连外壳都没缓存时才显示那张说明页。实测断网重载拿到的是缓存外壳，不是浏览器错误页 |
+| 实时内容离线可用 | ❌ 做不到，也不该做：`/api`、`/ipad-remote/api`、`/unlock` 永不进缓存——缓存一条活的流是错的，不只是旧 |
+| 桌面端本体不受影响 | ✅ worker 只在**网关代理过的页面**上注册（网关注入标记）：实测网关来源注册数 1、桌面端本体来源 0 |
+| 免 HTTPS | ⚠️ 做不到：浏览器只把 `localhost` 与 HTTPS 当安全来源。iPad 的安装入口本来就是「分享 → 添加到主屏幕」，Safari 从不显示安装按钮 |
 
-所以准确的说法是**「可安装的 Web 应用」**；等补上 service worker（缓存应用外壳、API 与 WebSocket 永不缓存）之后，才配得上「PWA」这个词。
+所以现在的准确说法是：**可安装的 Web 应用，带离线外壳**；「离线可用」只覆盖界面，实时内容仍要求主机在线。
 ## 安装
 
 插件对 `@deepseek-ai/*` **没有任何运行时依赖**（全部是 type-only import），`lib/` 与 `client/` 都能独立加载；发布包里带着 `assets/` 与 `cordis.patch.yml`（`pnpm pack --dry-run` 已验证）。

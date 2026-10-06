@@ -14,22 +14,22 @@ param(
   [int]$HarnessPort = 50080,
   [int]$GatewayPort = 50070,
   [string]$HarnessCheckout,
-  [string]$Home = (Join-Path $PSScriptRoot '..\.run-home')
+  [string]$DshHome = (Join-Path $PSScriptRoot '..\.run-home')
 )
 
 $ErrorActionPreference = 'Stop'
 $repo = Resolve-Path (Join-Path $PSScriptRoot '..')
 $overlay = Join-Path $repo '.run-overlay.yml'
-$Home = [System.IO.Path]::GetFullPath($Home)
+$DshHome = [System.IO.Path]::GetFullPath($DshHome)
 
 if (-not (Test-Path $overlay)) { throw "缺少 $overlay" }
 if (-not (Test-Path (Join-Path $HarnessCheckout 'apps\cli\src\bin.ts'))) { throw "Harness checkout 不存在: $HarnessCheckout" }
 
 # 让这个实例有可用的凭据与设置（只读复制，不动原文件）。
-New-Item -ItemType Directory -Force -Path $Home | Out-Null
+New-Item -ItemType Directory -Force -Path $DshHome | Out-Null
 foreach ($f in @('.credentials.yaml', 'settings.yaml.imported')) {
   $source = Join-Path $env:USERPROFILE ".dsh\$f"
-  if ((Test-Path $source) -and -not (Test-Path (Join-Path $Home $f))) { Copy-Item $source (Join-Path $Home $f) }
+  if ((Test-Path $source) -and -not (Test-Path (Join-Path $DshHome $f))) { Copy-Item $source (Join-Path $DshHome $f) }
 }
 
 Write-Host "Harness:  http://127.0.0.1:$HarnessPort/" -ForegroundColor Cyan
@@ -38,14 +38,14 @@ Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue |
   Where-Object { $_.IPAddress -notmatch '^127\.|^169\.254\.' } |
   ForEach-Object { Write-Host "          http://$($_.IPAddress):$GatewayPort/  ($($_.InterfaceAlias))" }
 
-$env:DSH_HOME = $Home
+$env:DSH_HOME = $DshHome
 Set-Location $HarnessCheckout
 $job = Start-Job -ScriptBlock {
   param($home, $checkout, $overlay, $port)
   $env:DSH_HOME = $home
   Set-Location $checkout
   node --import tsx/esm apps/cli/src/bin.ts --patch $overlay --profile web --no-open --port $port
-} -ArgumentList $Home, $HarnessCheckout, $overlay, $HarnessPort
+} -ArgumentList $DshHome, $HarnessCheckout, $overlay, $HarnessPort
 
 # 等控制面就绪后设置 PIN 并开启网关。
 $control = "http://127.0.0.1:$HarnessPort/ipad-remote/api"

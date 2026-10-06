@@ -14,6 +14,7 @@ import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { DEVICE_PREFIX } from './contract.js'
 import { adaptCss, adaptScript } from './mobile-adapt.js'
+import { REGISTRATION_MARKER, renderRegistrationScript } from './service-worker.js'
 
 /** Path the gateway serves generated icons from. */
 export const ICON_PREFIX = `${DEVICE_PREFIX}/icons`
@@ -99,6 +100,9 @@ export function enhanceIndexHtml(html: string): string {
     // it arrives with the document: the layer is inert on desktop because every
     // rule sits behind its portrait/touch/width media query.
     `<style data-ipad-remote="mobile-adapt">${ADAPT_STYLE_MARKER}${adaptCss()}</style>`,
+    // The offline shell, registered only on pages the gateway marked. Inert on the
+    // desktop origin, where no mark is ever injected.
+    `${REGISTRATION_MARKER}<script data-ipad-remote="service-worker">${renderRegistrationScript()}</script>`,
   ].join('\n    ')
 
   const withViewport = html.replace(

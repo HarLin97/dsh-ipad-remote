@@ -76,6 +76,16 @@ export declare function sessionSetCookie(value: string, maxAgeSeconds: number, s
 /** Clear-cookie header for logout. */
 export declare function sessionClearCookie(): string;
 /**
+ * Mark one proxied document as gateway-served.
+ *
+ * The client half registers its service worker only when this mark is present, so
+ * the desktop window — which shares a machine, and often a cookie jar, with the
+ * gateway — never gains a worker that could serve it stale assets.
+ * @param html - the document as the Harness rendered it.
+ * @returns the document carrying the marker script.
+ */
+export declare function injectGatewayMarker(html: string): string;
+/**
  * Reverse proxy in front of the loopback Harness webserver.
  */
 export declare class Gateway {

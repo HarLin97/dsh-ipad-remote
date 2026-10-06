@@ -2,7 +2,7 @@
 
 让 **iPad / 手机 / 另一台电脑**通过局域网、Tailscale 或 HTTPS 使用**桌面端 DeepSeek Harness 的同一个 Web UI**，并在网络入口加一层自己的 6 位 PIN 门禁。
 
-- **不做第二套 UI**：打开的就是桌面端那一个页面；安装后是独立窗口的 app（可安装的 Web 应用，暂无离线能力——见[能力边界](packages/ipad-remote/README.md#能力边界它不是离线-pwa)）。
+- **不做第二套 UI**：打开的就是桌面端那一个页面；安装后是独立窗口的 app（可安装的 Web 应用，带离线外壳；实时内容仍需主机在线——见[能力边界](packages/ipad-remote/README.md#能力边界)）。
 - **不改上游**：全部通过公开接缝接入（`tapIndex` / `ctx.slots` / `settings.section` / `dsh.bundle.patch` + `dsh.client`），Harness 本体保持在回环绑定。
 - **运行时零依赖**：对 `@deepseek-ai/*` 只有 type-only import，`lib/` 与 `client/` 可独立加载。
 
@@ -30,7 +30,7 @@ git clone <this repo> ; cd <this repo> ; pnpm install ; pnpm build
 ## 仓库结构
 
 - [packages/ipad-remote](packages/ipad-remote/README.md) —— 插件本体（网关、PIN 门禁、Web App 资产、触控层、设置卡片）与全部文档
-- [scripts](scripts) —— 证书签发、home 层安装、真实链路验证、DOM 锚点审计
+- [scripts](scripts) —— 证书签发、home 层安装、真实链路验证、DOM 锚点审计、可安装性与离线外壳检查（`check-installability.mjs`、`check-service-worker.mjs`）
 - [docs/superpowers/specs](docs/superpowers/specs) —— 设计规格（决策与取舍记录）
 
 ## 开发

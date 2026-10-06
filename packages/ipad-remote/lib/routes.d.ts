@@ -50,5 +50,7 @@ export declare function callerKey(req: IncomingMessage): string;
  * @param body - response bytes.
  * @param contentType - media type.
  * @param maxAgeSeconds - cache lifetime; 0 disables caching.
+ * @param extra - additional headers, for responses that need more than the three
+ *   every asset shares (the service worker's `Service-Worker-Allowed`).
  */
-export declare function sendBytes(res: ServerResponse, status: number, body: Buffer, contentType: string, maxAgeSeconds?: number): void;
+export declare function sendBytes(res: ServerResponse, status: number, body: Buffer, contentType: string, maxAgeSeconds?: number, extra?: Record<string, string>): void;

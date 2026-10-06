@@ -97,9 +97,12 @@ export function callerKey(req) {
  * @param body - response bytes.
  * @param contentType - media type.
  * @param maxAgeSeconds - cache lifetime; 0 disables caching.
+ * @param extra - additional headers, for responses that need more than the three
+ *   every asset shares (the service worker's `Service-Worker-Allowed`).
  */
-export function sendBytes(res, status, body, contentType, maxAgeSeconds = 0) {
+export function sendBytes(res, status, body, contentType, maxAgeSeconds = 0, extra = {}) {
     res.writeHead(status, {
+        ...extra,
         'content-type': contentType,
         'content-length': String(body.length),
         'cache-control': maxAgeSeconds > 0 ? `public, max-age=${String(maxAgeSeconds)}` : 'no-store',

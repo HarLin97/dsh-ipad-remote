@@ -13,6 +13,7 @@ import { SessionAuthority, SESSION_COOKIE } from './session.js';
 import { ConfigStore, DEFAULT_STATE } from './store.js';
 import { callerKey, readBody, sameOrigin, sendBytes, sendHtml, sendJson } from './routes.js';
 import { ICON_PREFIX, MANIFEST_PATH, readIcon, renderManifest } from './pwa.js';
+import { SERVICE_WORKER_PATH, SERVICE_WORKER_SCOPE, pluginVersion, renderServiceWorker } from './service-worker.js';
 import { coversAddress, loadTls, readCa } from './tls.js';
 import { LOGOUT_PATH, UNLOCK_PATH, renderUnlockPage } from './unlock-page.js';
 /** Milliseconds in one day. */
@@ -349,6 +350,16 @@ export class RemoteAccess {
         }
         if (path === UNLOCK_PATH && req.method === 'POST') {
             await this.submitPin(req, res);
+            return true;
+        }
+        // The worker is served from the gateway only; `Service-Worker-Allowed` lets it
+        // claim the root scope the app actually lives at. Never cached: a stale worker
+        // is a stale worker until the browser gives up on it.
+        if (path === SERVICE_WORKER_PATH && req.method === 'GET') {
+            const source = renderServiceWorker(await pluginVersion());
+            sendBytes(res, 200, Buffer.from(source, 'utf8'), 'text/javascript; charset=utf-8', 0, {
+                'service-worker-allowed': SERVICE_WORKER_SCOPE,
+            });
             return true;
         }
         // Gateway-only: the upstream manifest stays untouched for desktop users.
